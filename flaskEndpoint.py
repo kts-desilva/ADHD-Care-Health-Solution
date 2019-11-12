@@ -25,18 +25,16 @@ from nilearn.plotting import plot_epi
 import nibabel
 from matplotlib import pyplot as plt
 
-nii_file = ""
-csv_file = ""
-init_val = False
-# fmri_model = None
-# em_model = None
-status = 0
-preproc_status = 0
-fex_status = 0
-em_status = 0
+nii_file = "" #fmri data file
+csv_file = "" #eye movement data file
+
+fmri_status = 0  #fmri data prediction status
+preproc_status = 0 #fmri preprocessing status
+fex_status = 0 #fmri feature extraction status
+em_status = 0 #eye movement data prediction status
 
 def getfMRIModel():
-    fmri_model = load_model('first_try_model.h5')
+    fmri_model = load_model('fmri_model.h5')
     fmri_model.compile(loss='binary_crossentropy',optimizer='rmsprop', metrics=['accuracy'])
     return fmri_model
 
@@ -45,17 +43,19 @@ def getEyeMovementModel():
     return em_model
 
 def getEyeMovementPrediction():
-    global csv_file, init_val
+    global csv_file
     
     em_model= getEyeMovementModel()
 
     predict_data = pd.read_csv(csv_file, index_col=[0])
-    predict_data['Gender'] = pd.get_dummies(
-        predict_data['Gender'], prefix='Gender')
+
+    # Onehot encoding for gender (binary) column
+    predict_data['Gender'] = pd.get_dummies(predict_data['Gender'], prefix='Gender')
 
     predictions = em_model.predict(predict_data)
     counts = np.bincount(predictions)
-    bclass=np.argmax(counts)
+    bclass=np.argmax(counts) # Get the highest probable class
+
     probValue=0
     if(bclass==1):
         probValue=counts[1]/sum(counts)
@@ -63,7 +63,6 @@ def getEyeMovementPrediction():
         probValue=counts[0]/sum(counts)
         if probValue ==1:
             probValue=0.11
-    # return np.argmax(counts)
     K.clear_session()
     return probValue
 
@@ -116,10 +115,10 @@ def preporcessFMRI():
     preproc_status = 100
 
 def resetValues():
-    global status, preproc_status, fex_status, em_status
+    global fmri_status, preproc_status, fex_status, em_status
 
-    if(status == 100 and preproc_status == 100 and fex_status == 100):
-        status = 0
+    if(fmri_status == 100 and preproc_status == 100 and fex_status == 100):
+        fmri_status = 0
         preproc_status = 0
         fex_status = 0
 
@@ -127,8 +126,7 @@ def resetValues():
         em_status = 0
 
 def getFMRIPrediction():
-    global nii_file, init_val, status, fex_status
-    print(nii_file)
+    global nii_file, fmri_status, fex_status
 
     preporcessFMRI()
 
@@ -140,9 +138,10 @@ def getFMRIPrediction():
     time.sleep(1)
     fex_status = 100
     time.sleep(2)
+
     med2image.misc.tic()
     c_convert.run()
-    status = 40
+    fmri_status = 40
     
     fmri_model = getfMRIModel()
 
@@ -158,17 +157,22 @@ def getFMRIPrediction():
     images = np.vstack(images)
 
     clas = fmri_model.predict_classes(images, batch_size=10)
-    status = 60
+    fmri_status = 60
 
-    # print(cls)
     print('Possibility of ADHD: ', (clas == 0).sum()/len(clas))
     print('Possibility of non-ADHD: ', (clas == 1).sum()/len(clas))
 
     adhd = (clas == 0).sum()/len(clas)
     nadhd = (clas == 1).sum()/len(clas)
-    K.clear_session()
+    K.clear_session()   #To avoid reinstantiation of Tensorflow graph
     return adhd
 
+def storeData(fname, lname, email, age, diag, score, data_type, user, symptoms, chronicDisease):
+    cur = mysql.connection.cursor()
+    cur.execute("INSERT INTO Diagnosis (Patient_first_name,Patient_last_name,Email,Age,Diagnosis,Composite_Score,Data_Type,User,Symptoms,Test_date,Test_time,ChronicDisease) VALUES (%s, %s,%s,%s,%s,%s,%s,%s,%s,CURDATE(),CURTIME(),%s)",
+                (fname, lname, email, age, diag, score, data_type, user, symptoms,chronicDisease))
+    mysql.connection.commit()
+    cur.close()
 
 app = Flask(__name__)
 app.secret_key = "secret key"
@@ -235,8 +239,8 @@ def predict():
 
 @app.route("/status", methods=['GET', 'POST'])
 def get_status():
-    global status, preproc_status, fex_status
-    status_data = {'data': status,
+    global fmri_status, preproc_status, fex_status
+    status_data = {'data': fmri_status,
                    'preproc': preproc_status, 'fex': fex_status}
     return jsonify(status_data)
 
@@ -259,7 +263,6 @@ def get_fmri_preview():
     n_volumes = 96
 
     if request.method == 'POST':
-        print("****called")
         f= request.files['file']
         nii_file = os.path.join(
             app.config['UPLOAD_FOLDER'], secure_filename(f.filename))
@@ -290,13 +293,12 @@ def get_em_preview():
     
 @app.route("/fmri_uploader", methods=['GET', 'POST'])
 def upload_fmri_file():
-    global nii_file, init_val, status, preproc_status
+    global nii_file, fmri_status, preproc_status
     resetValues()
     preproc_status = 5
     if request.method == 'POST':
         print(request.form)
         f = request.files['file']
-        init_val = (nii_file == "")
         nii_file = os.path.join(
             app.config['UPLOAD_FOLDER'], secure_filename(f.filename))
         f.save(nii_file)
@@ -309,7 +311,7 @@ def upload_fmri_file():
             params = request.args
         adhd = getFMRIPrediction()
         nadhd = 1-adhd
-        status = 85
+        fmri_status = 85
 
         if(params != None):
             data['adhd'] = str(adhd)
@@ -322,7 +324,7 @@ def upload_fmri_file():
         else:
             diag = 'Non-ADHD'
             score = nadhd
-        status = 100
+        fmri_status = 100
         print(score)
         r = request.form
         if session.get('email'):
@@ -407,17 +409,15 @@ def get_patient_data():
 
 @app.route("/em_uploader", methods=['GET', 'POST'])
 def upload_em_file():
-    global csv_file, init_val, em_status
+    global csv_file, em_status
     if request.method == 'POST':
         f = request.files['file']
-        init_val = (nii_file == "")
         csv_file = os.path.join(
             app.config['UPLOAD_FOLDER'], secure_filename(f.filename))
         f.save(csv_file)
         flash('file uploaded suceessfully')
 
         session['em_status'] = 10
-        print("*****it is in g", session['em_status'])
         em_status = 10
 
         data = {'success': False}
@@ -431,7 +431,6 @@ def upload_em_file():
         session['em_status'] = 40
         em_status = 40
         adhd = getEyeMovementPrediction()
-        print("pppp ",adhd)
         nadhd = 1-adhd
         session['em_status'] = 60
         em_status = 60
@@ -460,20 +459,13 @@ def upload_em_file():
         else:
             user = "Guest"
         
-        storeData(r['fname'], r['lname'], r['email'], int(
-            r['age']), diag, score, 'EM', user, r['symptoms'],r['chronic'])
+        storeData(r['fname'], r['lname'], r['email'], int(r['age']), diag, score, 'EM', user, r['symptoms'],r['chronic'])
+        
         session['em_status'] = 100
         em_status = 100
         time.sleep(1)
 
         return redirect('/report')
-
-def storeData(fname, lname, email, age, diag, score, data_type, user, symptoms, chronicDisease):
-    cur = mysql.connection.cursor()
-    cur.execute("INSERT INTO Diagnosis (Patient_first_name,Patient_last_name,Email,Age,Diagnosis,Composite_Score,Data_Type,User,Symptoms,Test_date,Test_time,ChronicDisease) VALUES (%s, %s,%s,%s,%s,%s,%s,%s,%s,CURDATE(),CURTIME(),%s)",
-                (fname, lname, email, age, diag, score, data_type, user, symptoms,chronicDisease))
-    mysql.connection.commit()
-    cur.close()
     
 @app.route('/register', methods=["GET", "POST"])
 def register():
@@ -530,16 +522,13 @@ def logout():
 
 @app.route('/account', methods=["GET", "POST"])
 def account():
-    print('called account')
     if session['name'] != '' and session['email'] != '':
-        print('has session')
+        print('Session started ....')
         email = session['email']
         curl = mysql.connection.cursor()
         curl.execute(
             "SELECT * FROM Diagnosis inner join User ON Diagnosis.User = User.Email WHERE Diagnosis.User=%s", (email,))
         data = curl.fetchall()
-        if not (len(data)>0):
-            print("*********nnooo",len(data))
         curl.close()
         return render_template('account.html', data=data,len=len(data))
     else:

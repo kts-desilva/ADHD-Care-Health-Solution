@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flask file upload</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+</head>
+<body>
+    <h2>Select file to upload</h2>
+    
+		<input id="data_file" type="file" name="file"/>
+
+		<br>
+    <button onclick="predict_value()">Predict</button>
+    <p id="adhd_val">ADHD prediction: </p>
+    <p id="nadhd_val">Non-ADHD prediction: </p>
+		<img id="loading_image" src="/static/giphy.gif" style="display: none;" />
+
+    <script type="text/javascript">
+				var formdata;
+				$('#data_file').change(function(){    
+    			//on change event  
+    				formdata = new FormData();
+    				if($(this).prop('files').length > 0){
+        				file =$(this).prop('files')[0];
+        				formdata.append("file", file);
+    				}
+						console.log(formdata);
+				});
+        function predict_value() {
+						$('#loading_image').show();
+						console.log(formdata);
+            $.ajax({
+                url:'/fmri_uploader',
+								type:'POST',
+								data:formdata,
+								processData: false,
+						    contentType: false,
+                success:function (res) {
+                    console.log(res);
+                    document.getElementById('adhd_val').innerHTML+=res.adhd;
+                    document.getElementById('nadhd_val').innerHTML+=res.nadhd;
+                },
+								complete: function(){
+									  $('#loading_image').hide();
+								},
+
+            });
+        }
+    </script>
+</body>
+</html>

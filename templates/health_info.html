@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" href="static/img/favicon.png" type="image/png">
+    <title>ADHD-Care</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="static/css/bootstrap.css">
+    <link rel="stylesheet" href="static/css/themify-icons.css">
+    <link rel="stylesheet" href="static/css/flaticon.css">
+    <link rel="stylesheet" href="static/vendors/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="static/vendors/owl-carousel/owl.carousel.min.css">
+    <link rel="stylesheet" href="static/vendors/animate-css/animate.css">
+    <!-- main css -->
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="static/css/responsive.css">
+</head>
+
+<div class="modal fade" id="checkRegModal" role="dialog" style="padding-top: 8%" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="col-md-12">
+                    <div class="card-service text-center text-lg-left mb-4 mb-lg-0" style="align-items: center; border: 4px solid #aad3f5">
+                        <p style="text-align: center">
+                            <span class="card-service__icon" style="align-items: center">
+                                <i class="flaticon-face" style="align-items: center"></i>
+                            </span>
+                        </p>
+                        <h3 class="card-service__title" style="text-align: center">Are you a registered patient?</h3>
+                        <p class="card-service__subtitle" style="text-align: center">If you are a registered patient please press YES, otherwise press NO to registered with the system</p>
+                        <p style="text-align: center">
+                            <a href="#" onclick="searchUser()" class="genric-btn success radius" data-dismiss="modal">YES</a>
+                            <a href="#" onclick="addUser()" class="genric-btn success radius" data-dismiss="modal">NO</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="regUserModal" role="dialog" style="padding-top: 8%" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="col-md-12">
+                    <div class="card-service text-center text-lg-left mb-4 mb-lg-0" style="align-items: center; border: 4px solid #aad3f5">
+                        <p style="text-align: center">
+                            <span class="card-service__icon" style="align-items: center">
+                                <i class="flaticon-face" style="align-items: center"></i>
+                            </span>
+                        </p>
+                        <h3 class="card-service__title" style="text-align: center">Enter your patient ID</h3>
+                        <input type="text" class="form-control" id="c_id" name="c_id" style="text-align: center" required="required">
+                        <p id="error_msg"></p>
+                        <p style="text-align: center; margin-top: 13px">
+                            <a href="#" onclick="fillUserValues()" class="genric-btn success radius" type="submit">DONE</a>
+                            <a href="#" onclick="showCheckReg()" class="genric-btn success radius" data-dismiss="modal">BACK</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="fmriUploadModal" role="dialog" style="padding-top: 8%" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="card-service text-center text-lg-left mb-4 mb-lg-0" style="align-items: center; border: 4px solid #aad3f5">
+                    <h3 class="card-service__title" style="text-align: center">Upload fMRI Data</h3>
+                    <div class="col-lg-12">
+                        <div class="custom-file">
+                            <input type="file" accept=".nii,.gz" class="custom-file-input" id="frmi_data_file" onchange="setfMRIData()" required>
+                            <label class="custom-file-label" for="frmi_data_file">Choose file</label>
+                        </div>
+                    </div>
+                    <br>
+                    <h4 class="card-service__title" style="text-align: center">Preview</h4>
+                    <div class="col-lg-12">
+                        <!-- <img  src="static/img/no_preview.png" /> -->
+                        <img id="fmri_preview" src="static/img/no-preview.png" />
+                    </div>
+                    <p style="text-align: center; margin-top: 13px">
+                        <a class="genric-btn success radius" type="submit" onclick="return false" id="doneBtn">DONE</a>
+                        <a href="#" onclick="resetUploadFile()" class="genric-btn success radius" data-dismiss="modal">CANCEL</a>
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!--================Header Menu Area =================-->
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" href="static/img/favicon.png" type="image/png">
+    <title>ADHD-Care</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="static/css/bootstrap.css">
+    <link rel="stylesheet" href="static/css/themify-icons.css">
+    <link rel="stylesheet" href="static/css/flaticon.css">
+    <link rel="stylesheet" href="static/vendors/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="static/vendors/owl-carousel/owl.carousel.min.css">
+    <link rel="stylesheet" href="static/vendors/animate-css/animate.css">
+    <!-- main css -->
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="static/css/responsive.css">
+</head>
+
+<body>
+
+
+    <!--================Header Menu Area =================-->
+    <header>
+
+        <div class="main_menu">
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <div class="container">
+                    <!-- Brand and toggle get grouped for better mobile display -->
+                    <a class="navbar-brand logo_h" href="/">
+                        <img src="static/img/icon.jpg" alt="" height="60" width="250">
+                    </a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                    <div class="collapse navbar-collapse offset" id="navbarSupportedContent">
+                        <ul class="nav navbar-nav menu_nav ml-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="/">
+                                    <strong>
+                                        <font color="black">Home</strong>
+                                    </font>
+                                    </strong>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="static/about-us.html">
+                                    <strong>
+                                        <font color="black">About</font>
+                                    </strong>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="static/services.html">
+                                    <strong>
+                                        <font color="black">Services</font>
+                                    </strong>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="static/blog.html">
+                                    <strong>
+                                        <font color="black">Blog</font>
+                                    </strong>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="static/userguide.html">
+                                    <strong>
+                                        <font color="black">Learn</font>
+                                    </strong>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="static/contact.html">
+                                    <strong>
+                                        <font color="black">Contact</font>
+                                    </strong>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/register">
+                                    <strong>
+                                        <font color="black">Account</font>
+                                    </strong>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!--================Home Banner Area =================-->
+    <!--================End Home Banner Area =================-->
+
+    <style>
+        .help-tip {
+            position: relative;
+            top: 18px;
+            right: 18px;
+            text-align: center;
+            background-color: rgb(108, 125, 223);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            line-height: 26px;
+            cursor: default;
+        }
+
+        .help-tip:before {
+            content: '?';
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .help-tip:hover p {
+            display: block;
+            transform-origin: 100% 0%;
+
+            -webkit-animation: fadeIn 0.3s ease-in-out;
+            animation: fadeIn 0.3s ease-in-out;
+
+        }
+
+        .help-tip p {
+            /* The tooltip */
+            display: none;
+            text-align: left;
+            background-color: #1E2021;
+            padding: 20px;
+            width: 300px;
+            position: relative;
+            border-radius: 3px;
+            box-shadow: 1px 1px 1px rgba(31, 93, 228, 0.2);
+            right: -4px;
+            color: #FFF;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .help-tip p:before {
+            /* The pointer of the tooltip */
+            position: relative;
+            content: '';
+            width: 0;
+            height: 0;
+            border: 6px solid transparent;
+            border-bottom-color: #1E2021;
+            right: 10px;
+            top: -12px;
+        }
+
+        .help-tip p:after {
+            /* Prevents the tooltip from being hidden */
+            width: 100%;
+            height: 40px;
+            content: '';
+            position: relative;
+            top: -40px;
+            left: 0;
+        }
+
+        /* CSS animation */
+
+        @-webkit-keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.6);
+            }
+
+            100% {
+                opacity: 100%;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 100%;
+            }
+        }
+    </style>
+    <!-- ================ contact section start ================= -->
+    <div class="service-area area-padding-top">
+        <div class="container">
+            <div class="area-heading row">
+                <div class="col-md-5 col-xl-4">
+                    <h3>Check ADHD</h3>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+
+                    <form id="checkform">
+
+                        <div class="p-3 p-lg-5 border">
+                            <div class="form-group row">
+                                <div class="col-md-6">
+                                    <label for="c_fname" class="text-black">First Name
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="c_fname" name="c_fname" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="c_lname" class="text-black">Last Name
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="c_lname" name="c_lname" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <label for="c_email" class="text-black">Email
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="email" class="form-control" id="c_email" name="c_email" placeholder="" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <label for="c_age" class="text-black">Age
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="number" min="1" max="18" class="form-control" id="c_age" name="c_age" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <label for="c_symptoms" class="text-black">Symptoms </label>
+                                    <textarea name="c_symptoms" id="c_symptoms" cols="30" rows="3" class="form-control" required></textarea>
+                                </div>
+                            </div>
+                            <!-- <div class="form-group row">
+                                <div class="col-md-12">
+                                    <label for="c_symptoms" class="text-black">Other Chronic Diseases </label>
+                                    <textarea name="c_symptoms" id="c_chronic" cols="30" rows="3" class="form-control"></textarea>
+                                </div>
+                            </div> -->
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <!-- <label for="c_symptoms" class="text-black">Other Chronic Diseases </label>
+                                    <textarea name="c_symptoms" id="c_chronic" cols="30" rows="3" class="form-control"></textarea> -->
+                                    <span>Any other chronic diseases?</span>
+                                    <label for="chkYes">
+                                        <input type="radio" id="chkYes" name="chkChronic" onclick="EnableDisableTextBox()" /> Yes
+                                    </label>
+                                    <label for="chkNo">
+                                        <input type="radio" id="chkNo" name="chkChronic" onclick="EnableDisableTextBox()" value="None" /> No
+                                    </label>
+                                    <br />
+                                    <label for="c_chronic"> Description </label>
+                                    <textarea name="c_chronic" id="c_chronic" cols="30" rows="3" class="form-control" required value=None/></textarea>
+
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    <label for="frmi_data_file" class="text-black">fMRI data
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                </div>
+                                <div class="col-md-3">
+                                    <input class="genric-btn success medium" style="font-weight: bold;" value="Upload File" onclick="upload_fmri()">
+                                </div>    
+                                <div class="col-md-5">
+                                    <p id="upload_file_name"></p>
+                                </div>
+                            </div>
+                            <!-- <div class="form-group row">
+                                <div class="col-lg-12">
+                                    <label for="frmi_data_file" class="text-black">fMRI data
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <div class="custom-file">
+                                            <input type="file"  accept=".nii,.gz" class="custom-file-input" id="frmi_data_file" aria-describedby="frmi_data_file" onchange="setfMRIData()">
+                                            <label class="custom-file-label" for="frmi_data_file">Choose file</label>
+                                        </div>
+                                    </div> -->
+
+                                    <!-- <input class="btn btn-primary btn-lg btn-block" value="Upload File" onclick="upload_fmri()">
+
+                                    <div class="custom-file">
+                                        <input type="file" accept=".nii,.gz" class="custom-file-input" id="frmi_data_file" onchange="setfMRIData()" required>
+                                        <label class="custom-file-label" for="frmi_data_file">Choose file</label>
+                                    </div> -->
+                                <!-- </div>
+                            </div> --> 
+                            <!--  <div class="form-group row">
+                                <div class="col-lg-12">
+                                    <label for="frmi_data_file" class="text-black">fMRI data                                    
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="file" id="frmi_data_file" class="genric-btn success-border medium" onchange="setfMRIData()">
+                                </div>
+                            </div> -->
+                            <div class="form-group row" style="display: none" id="pre_prog">
+                                <div class="col-lg-2">
+                                    <p>Preprocessing</p>
+                                </div>
+                                <div class="col-lg-9">
+                                    <div class="progress" style="margin-top: 10px;">
+                                        <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%" id="fmri_preproc_pbar">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-1" style="vertical-align: top; display: none" id="preproc_check">
+                                    <img src="static/img/icon/check-symbol.png" />
+                                </div>
+                            </div>
+                            <div class="form-group row" style="display: none" id="fex_prog">
+                                <div class="col-lg-2">
+                                    <p>Feature Extracting</p>
+                                </div>
+                                <div class="col-lg-9">
+                                    <div class="progress" style="margin-top: 10px;">
+                                        <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%" id="fmri_fex_pbar">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-1" style="vertical-align: top; display: none" id="fex_check">
+                                    <img src="static/img/icon/check-symbol.png" />
+                                </div>
+                            </div>
+                            <div class="form-group row" style="display: none" id="prog">
+                                <div class="col-lg-2">
+                                    <p>Predicting</p>
+                                </div>
+                                <div class="col-lg-9">
+                                    <div class="progress" style="margin-top: 10px;">
+                                        <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%" id="fmri_pbar">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-1" style="vertical-align: top; display: none;" id="fmri_check">
+                                    <img src="static/img/icon/check-symbol.png" />
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-lg-12">
+                                    <input class="btn btn-primary btn-lg btn-block" value="Health Report" type="submit" onclick="fmri_predict_value()">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- ================ contact section end ================= -->
+
+    <!-- start footer Area -->
+    <footer class="footer-area area-padding-top">
+        <div class="container">
+
+            <div class="row footer-bottom d-flex justify-content-between">
+                <p class="col-lg-8 col-sm-12 footer-text m-0">
+                    <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                    Copyright &copy;
+                    <script>document.write(new Date().getFullYear());</script> All rights reserved for CSE @UOM
+                    <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                </p>
+            </div>
+        </div>
+    </footer>
+    <!-- End footer Area -->
+
+
+
+    <!--================Contact Success and Error message Area =================-->
+    <div id="success" class="modal modal-message fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <h2>Thank you</h2>
+                    <p>Your message is successfully sent...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals error -->
+
+    <div id="error" class="modal modal-message fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <h2>Sorry !</h2>
+                    <p> Something went wrong </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--================End Contact Success and Error message Area =================-->
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="static/js/jquery-2.2.4.min.js"></script>
+    <script src="static/js/popper.js"></script>
+    <script src="static/js/bootstrap.min.js"></script>
+    <script src="static/js/stellar.js"></script>
+    <script src="static/vendors/owl-carousel/owl.carousel.min.js"></script>
+    <script src="static/js/jquery.ajaxchimp.min.js"></script>
+    <script src="static/js/waypoints.min.js"></script>
+    <script src="static/js/mail-script.js"></script>
+    <script src="static/js/contact.js"></script>
+    <script src="static/js/jquery.form.js"></script>
+    <script src="static/js/jquery.validate.min.js"></script>
+    <script src="static/js/mail-script.js"></script>
+    <script src="static/js/theme.js"></script>
+    <script src="static/js/main.js"></script>
+
+
+    <script>
+        $(document).ready(function () {
+            var refresh_id = setInterval(function () {
+                console.log('status called')
+                //var fmri = $("#fmri_check").prop("value");
+                //var preproc = $("#preproc_check").prop("value");
+                //var fex = $("#fex_check").prop("value");
+                //if (fmri == 100 & preproc == 100 & fex==100){    
+                $.get(
+                    "/status",
+                    function (data) {
+                        console.log(data);
+                        progress = document.getElementById('fmri_pbar');
+                        progress.setAttribute("style", `width: ${data.data}%`);
+                        if (data.data == 100) {
+                            $('#fmri_check').show();
+                        }
+
+                        preproc_progress = document.getElementById('fmri_preproc_pbar');
+                        preproc_progress.setAttribute("style", `width: ${data.preproc}%`);
+                        if (data.preproc == 100) {
+                            $('#preproc_check').show();
+                        }
+
+                        fex_progress = document.getElementById('fmri_fex_pbar');
+                        fex_progress.setAttribute("style", `width: ${data.fex}%`);
+                        if (data.fex == 100) {
+                            $('#fex_check').show();
+                        }
+                    }
+                )
+
+            }
+                , 1000);
+        });
+    </script>
+    <script>
+        // Add the following code if you want the name of the file appear on select
+        $(".custom-file-input").on("change", function () {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+    </script>
+
+    <script type="text/javascript">
+        function EnableDisableTextBox() {
+            var chkYes = document.getElementById("chkYes");
+            var c_chronic = document.getElementById("c_chronic");
+            c_chronic.disabled = chkYes.checked ? false : true;
+            if (!c_chronic.disabled) {
+                c_chronic.focus();
+            }
+        }
+    </script>
+
+</body>
+
+</html>
