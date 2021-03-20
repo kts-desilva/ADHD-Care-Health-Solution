@@ -43,7 +43,7 @@ indexed-gzip==0.8.10
 isodate==0.6.0
 itsdangerous==1.1.0
 jdcal==1.4.1
-Jinja2==2.10.1
+Jinja2==2.11.3
 Keras==2.2.4
 numpy==1.16.2
 
