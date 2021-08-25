@@ -120,7 +120,7 @@ tablib==0.14.0
 tedana==0.0.7
 templateflow==0.4.1
 tensorboard==1.13.1
-tensorflow==1.13.1
+tensorflow==2.5.1
 tensorflow-estimator==1.13.0
 termcolor==1.1.0
 tqdm==4.32.2
