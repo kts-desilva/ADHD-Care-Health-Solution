@@ -52,7 +52,7 @@ Keras-Preprocessing==1.0.9
 kiwisolver==1.0.1
 knnimpute==0.1.0
 lockfile==0.12.2
-lxml==4.3.4
+lxml==4.9.1
 Markdown==3.0.1
 MarkupPy==1.14
 MarkupSafe==1.1.1
